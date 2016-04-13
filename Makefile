@@ -38,10 +38,6 @@ TARGET  = t
 #------------------------------------------------------
 $(TARGET): $(OBJS)
 	ar rvs -o $(LIB_NAME).a $(OBJS)
-	mkdir lib
-	mv $(LIB_NAME).a lib/$(LIB_NAME).a
-	rm *.o
-
 #$(OBJ1): $(SRC1)
 #       $(CPP) -c $(SRC1) -I$(INCLUDE) $(CFLAGS)
 $(OBJ2): $(SRC2)
