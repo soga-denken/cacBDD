@@ -1,43 +1,49 @@
 .SUFFIXES: .o .cc .u
 
-WHERE	= .
-CPP	= g++
-CFLAGS = -g -O3 -Wno-deprecated
+LIB_NAME = libcacBDD
+WHERE   = .
+#BIT    = 32
+BIT     = 64
+CPP     = g++
+CFLAGS = -m$(BIT) -g -O3 -Wno-deprecated
 
-INCLUDE = $(WHERE)/include
+INCLUDE = $(WHERE)/includes
 
 ####################################################
-File1	= ./main
-File2	= ./UTable
-File3	= ./Manager
-File4	= ./CTable
-File5	= ./BDDNode
-File6   = ./DdNode
+#File1  = main
+File2   = UTable
+File3   = Manager
+File4   = CTable
+File5   = BDDNode
+File6   = DdNode
 
-SRC1	= $(File1).cpp
-SRC2	= $(File2).cpp
-SRC3	= $(File3).cpp
-SRC4	= $(File4).cpp
-SRC5	= $(File5).cpp
-SRC6	= $(File6).cpp
+#SRC1   = ./examples/$(File1).cpp
+SRC2    = ./src/$(File2).cpp
+SRC3    = ./src/$(File3).cpp
+SRC4    = ./src/$(File4).cpp
+SRC5    = ./src/$(File5).cpp
+SRC6    = ./src/$(File6).cpp
 
-OBJ1	= $(File1).o
-OBJ2	= $(File2).o
-OBJ3	= $(File3).o
-OBJ4	= $(File4).o
-OBJ5	= $(File5).o
+#OBJ1   = $(File1).o
+OBJ2    = $(File2).o
+OBJ3    = $(File3).o
+OBJ4    = $(File4).o
+OBJ5    = $(File5).o
 OBJ6    = $(File6).o
 
 
-OBJS	= $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5) $(OBJ6)
+OBJS    = $(OBJ1) $(OBJ2) $(OBJ3) $(OBJ4) $(OBJ5) $(OBJ6)
 
-TARGET	= t
+TARGET  = t
 #------------------------------------------------------
 $(TARGET): $(OBJS)
-	$(CPP) $(CFLAGS) -o $(TARGET) $(OBJS) $(LIBS) -lm
+	ar rvs -o $(LIB_NAME).a $(OBJS)
+	mkdir lib
+	mv $(LIB_NAME).a lib/$(LIB_NAME).a
+	rm *.o
 
-$(OBJ1): $(SRC1)
-	$(CPP) -c $(SRC1) -I$(INCLUDE) $(CFLAGS)
+#$(OBJ1): $(SRC1)
+#       $(CPP) -c $(SRC1) -I$(INCLUDE) $(CFLAGS)
 $(OBJ2): $(SRC2)
 	$(CPP) -c $(SRC2) -I$(INCLUDE) $(CFLAGS)
 $(OBJ3): $(SRC3)
@@ -54,7 +60,6 @@ $(OBJ6): $(SRC6)
 cl: #clean
 	rm -f *.o *.u mon.out gmon.out *.pixie *.Addrs *.Counts mnem.* \
 	.pure core *.warnings *.cpp~ *.h~ Makefile~
+	rm -rf lib
 
 cla: #clean all
-	rm -f $(TARGET) *.o *.cpp~ *.h~ Makefile~
-#------------------------------------------------------

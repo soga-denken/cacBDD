@@ -68,7 +68,7 @@ namespace cacBDD
 		void  Clear();
 		void  Expand();
 		DD    Find_or_Add_Unique_Table(int v, DD A, DD B);
-		double HitRate() { return 1.0 * foundedCount / std::max(findCount, long long(1)); }
+		double HitRate() { return 1.0 * foundedCount / std::max(findCount, (long long)(1)); }
 	};
 
 }
