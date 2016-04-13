@@ -17,7 +17,7 @@ met:
   and/or other materials provided with the distribution.
 
 * Neither the name of the University of Beijing Technology and
-  the University of Griffith nor the names of its contributors 
+  the University of Griffith nor the names of its contributors
   may be used to endorse or promote products derived from this
   software without specific prior written permission.
 
@@ -39,67 +39,47 @@ written by
    Guanfeng Lv, last updated 10/26/2012
 *****************************************************************************/
 
+#include<DdNode.h>
 
-
-#ifndef __XINTS__
-#define __XINTS__
-
-#include <memory.h>
-#include <iostream>
-using namespace std;
-
-class XInts{
-private:
-    int size; 
-    int *buffer;
-public:
-    XInts():size(0),buffer(0){};
-    ~XInts(){
-        size  = 0; 
-        if(buffer){
-            free(buffer);
-            buffer = NULL;
-        };
-    }
-    inline void set_size(int vsize);
-    inline int  get_size();
-    inline void set_value(int index, int value);
-    inline int  get_value(int index);
-};
-
-inline void XInts::set_size(int vsize)
+namespace cacBDD
 {
-    if(buffer){
-        free(buffer);
-        buffer = NULL;
-    }
-    size = vsize;
+	DdNodes::DdNodes()
+	{
+		slots = NULL;
+	}
 
-    buffer = (int *)realloc(buffer, size * sizeof(int));
-    memset(buffer, 0, size * sizeof(int));
+	DdNodes::~DdNodes()
+	{
+		Clear();
+	}
+
+	void DdNodes::Init(int vSlotSize)
+	{
+		typedef DdNode* PDdNode;
+		slots = new PDdNode[10000];
+		for (int i = 0; i < 10000; i++) {
+			slots[i] = 0;
+		}
+
+		slotSize = vSlotSize;
+		slots[0] = new DdNode[slotSize];
+		for (int k = 0; k < slotSize; k++) {
+			slots[0][k].SetValue(0, 0, 0, 0);
+		}
+
+		slotCount = 1;
+		nodeCount = 1;
+	}
+
+	void DdNodes::Clear()
+	{
+		if (slots == NULL) return;
+
+		for (int i = 0; i < slotCount; i++) {
+			delete[](slots[i]);
+			slots[i] = NULL;
+		}
+		delete[]slots;
+		slots = NULL;
+	}
 }
-
-inline int  XInts::get_size()
-{
-    return size;
-}
-
-inline void XInts::set_value(int index, int value)
-{    
-    if(index >= size){      
-        int addCount = (index - size)+1000;
-        buffer = (int *)realloc(buffer, (size + addCount)*sizeof(int));
-        memset(&buffer[size], 0, addCount * sizeof(int));
-        size += addCount;
-    }
-    buffer[index] = value;
-}
-
-inline int  XInts::get_value(int index)
-{
-    if(index >= size) return 0;
-    return buffer[index];
-}
-
-#endif
-

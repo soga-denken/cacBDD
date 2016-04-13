@@ -17,7 +17,7 @@ met:
   and/or other materials provided with the distribution.
 
 * Neither the name of the University of Beijing Technology and
-  the University of Griffith nor the names of its contributors 
+  the University of Griffith nor the names of its contributors
   may be used to endorse or promote products derived from this
   software without specific prior written permission.
 
@@ -39,33 +39,76 @@ written by
    Guanfeng Lv, last updated 10/26/2012
 *****************************************************************************/
 
-#ifndef _UTABLE_
-#define _UTABLE_
+#pragma once
 
-#include "DdNode.h"
+#include <memory.h>
 
-class XManager;
+namespace cacBDD
+{
 
-class XUTable{
-private:
-   friend class XManager;
+	typedef unsigned char XBYTE;
+	class XBits {
+	private:
+		int bitSize;
+		int chrCount;
+		XBYTE *buffer;
+	public:
+		XBits() :bitSize(0), chrCount(0), buffer(0) {};
+		~XBits() {
+			bitSize = 0;
+			chrCount = 0;
+			if (buffer) {
+				free(buffer);
+				buffer = NULL;
+			};
+		}
+		inline void set_size(int vsize);
+		inline int  get_size();
+		inline void set_value(int index, int value);
+		inline int  get_value(int index);
+	};
 
-    XManager *mgr;
-    int count;
-    int shiftSize;    
-    DD *items;
-    long long findCount;
-    long long foundedCount;
-    double LinkLength();
-    void   Refresh();
+	inline void XBits::set_size(int vsize)
+	{
+		if (buffer) {
+			free(buffer);
+			buffer = NULL;
+		};
+		bitSize = vsize;
+		chrCount = (bitSize >> 3) + 1;
+		buffer = (XBYTE *)realloc(buffer, chrCount);
+		memset(buffer, 0, chrCount);
+	}
 
-public:	
-    XUTable(XManager *manager, int vBitCount);
-    ~XUTable();	
-    void  Clear();
-    void  Expand();
-    DD    Find_or_Add_Unique_Table(int v, DD A, DD B);
-    double HitRate(){ return 1.0 * foundedCount / Max(findCount, 1); }
-};
+	inline int  XBits::get_size()
+	{
+		return bitSize;
+	}
 
-#endif
+	inline void XBits::set_value(int index, int value)
+	{
+		if (index >= bitSize) {
+			int addChrCnt = ((index - bitSize) >> 3) + 10000;
+			buffer = (XBYTE *)realloc(buffer, chrCount + addChrCnt);
+			memset(&buffer[chrCount], 0, addChrCnt);
+			chrCount += addChrCnt;
+			bitSize = index + addChrCnt * 8;
+		}
+
+		XBYTE one = 0x80;
+		int a = (index >> 3);
+		if (value == 1) {
+			buffer[a] = (buffer[a] | (one >> (index % 8)));
+		}
+		else {
+			buffer[a] = (buffer[a] & ~(one >> (index % 8)));
+		}
+	}
+
+	inline int  XBits::get_value(int index)
+	{
+		int a = (index >> 3);
+		XBYTE r = ((buffer[a] >> (7 - index % 8)) & 0x01);
+		return r;
+	}
+}

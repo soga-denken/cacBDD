@@ -17,7 +17,7 @@ met:
   and/or other materials provided with the distribution.
 
 * Neither the name of the University of Beijing Technology and
-  the University of Griffith nor the names of its contributors 
+  the University of Griffith nor the names of its contributors
   may be used to endorse or promote products derived from this
   software without specific prior written permission.
 
@@ -39,83 +39,35 @@ written by
    Guanfeng Lv, last updated 10/26/2012
 *****************************************************************************/
 
+#pragma once
 
-#ifndef _DDNODE_
-#define _DDNODE_
+#define WIN
 
-#include "Base.h"
-#include <stdlib.h>
-#include <iostream>
-#include <assert.h>
-
-using namespace std;
-
-class DdNode{
-public:
-    int var;     
-    int Then;
-    int Else;	
-    int Next;	
-    DdNode():var(0),Then(0),Else(0),Next(0){};
-    DdNode(DdNode &v)
-    {  
-        var = v.var;
-        Then = v.Then;
-        Else = v.Else;
-        Next = v.Next;
-    } 
-    DdNode& operator = (const DdNode& v)
-    {
-        var = v.var;
-        Then = v.Then;
-        Else = v.Else;
-        Next = v.Next;
-        return *this;
-    }
-
-    void SetValue(int a, int b, int c, int d){ var = a; Then = b; Else = c; Next = d; };
-};
-
-class DdNodes{
-private:
-    friend class XManager;
-    int slotCount; 
-    int slotSize; 
-    int nodeCount; 
-    DdNode **slots;
-public:
-    DdNodes();
-    ~DdNodes();
-
-    int  GetFreeNode();
-    void Init(int vSlotSize);
-    void Clear();
-    int  NodeCount(){ return nodeCount;};
-
-    DdNode& operator [] (int index);
-};
-
-inline DdNode& DdNodes::operator [] (int index)
-{
-    int s = index / slotSize;
-    int i = index % slotSize;    
-    return slots[s][i];
-}
-
-inline int DdNodes::GetFreeNode() 
-{   
-    if(nodeCount == slotCount * slotSize){      
-        slots[slotCount] = new DdNode[slotSize];
-
-        for(int k=0; k<slotSize; k++){
-            slots[slotCount][k].SetValue(0,0,0,0);
-        }                
-        slotCount++;        
-
-    }
-    nodeCount++;
-    return (nodeCount - 1);
-};
-
+#ifdef WIN
+#include <time.h>
+#else
+#include <sys/time.h>
+#include "sys/resource.h"
 #endif
 
+namespace cacBDD
+{
+	class Timer {
+	public:
+		static double GetTime(void)
+		{
+#ifndef WIN
+			struct rusage ru;
+			getrusage(RUSAGE_SELF, &ru);
+			return (ru.ru_utime.tv_sec * 1000 +
+				ru.ru_utime.tv_usec / 1000 +
+				ru.ru_stime.tv_sec * 1000 +
+				ru.ru_stime.tv_usec / 1000) / 1000.0;
+#else
+			clock_t c = clock();
+			double r = (double)(c) / CLOCKS_PER_SEC;
+			return r;
+#endif
+		};
+	};
+}

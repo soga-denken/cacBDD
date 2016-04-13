@@ -39,35 +39,30 @@ written by
    Guanfeng Lv, last updated 10/26/2012
 *****************************************************************************/
 
-#ifndef __TIMER__
-#define __TIMER__
 
-#define WIN
+#include "BDDNode.h"
 
-#ifdef WIN
-  #include <time.h>
-#else
-  #include <sys/time.h>
-  #include "sys/resource.h"
-#endif
+int main(int argc, char **argv)
+{   
 
-class Timer{
-public:
-    static double GetTime(void)
-    {
-#ifndef WIN
-        struct rusage ru;
-        getrusage(RUSAGE_SELF, &ru);
-        return ( ru.ru_utime.tv_sec*1000 +
-            ru.ru_utime.tv_usec/1000+
-            ru.ru_stime.tv_sec*1000 +
-            ru.ru_stime.tv_usec/1000 ) / 1000.0;
-#else
-        clock_t c = clock();
-        double r = (double)(c) / CLOCKS_PER_SEC;
-        return r;
-#endif
-    };
-};
+    int vc = 6;
+    XBDDManager mgr(vc);
 
-#endif
+    BDD *x = new BDD[vc+1];
+    for(int i=1; i<=vc; i++){
+        x[i] = mgr.BddVar(i);
+    }
+
+    BDD r = (!x[4] + !x[6]) * (!x[3] + !x[6]) * (!x[2] + !x[5]);
+  
+    BDD v  = mgr.BddOne();
+    if (r == v) cout<<"equal to one"<<endl;
+    else cout<<"not equal to one"<<endl;
+
+    mgr.ShowInfo();
+    
+    delete []x;
+    
+    return 0;
+}
+

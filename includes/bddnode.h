@@ -17,7 +17,7 @@ met:
   and/or other materials provided with the distribution.
 
 * Neither the name of the University of Beijing Technology and
-  the University of Griffith nor the names of its contributors 
+  the University of Griffith nor the names of its contributors
   may be used to endorse or promote products derived from this
   software without specific prior written permission.
 
@@ -39,27 +39,29 @@ written by
    Guanfeng Lv, last updated 10/26/2012
 *****************************************************************************/
 
-#ifndef _BDDNODE_
-#define _BDDNODE_
+#pragma once
 
-#include "Manager.h"
+#include<Manager.h>
 
-class BDD{
-private:
-	    friend class XManager;
-        friend class XBDDManager;
+namespace cacBDD
+{
+
+	class BDD {
+	private:
+		friend class XManager;
+		friend class XBDDManager;
 		DD node;
 		XManager *mgr;
-public:
+	public:
 		BDD(XManager *m, DD vNode);
 		BDD(const BDD &right);
 		BDD();
-	    ~BDD();
+		~BDD();
 
-		inline XManager *checkSameManager( const BDD &other) const;
-		bool operator==(const BDD& other) const; 
-		bool operator!=(const BDD& other) const; 
-		BDD& operator=(const BDD& right);  
+		inline XManager *checkSameManager(const BDD &other) const;
+		bool operator==(const BDD& other) const;
+		bool operator!=(const BDD& other) const;
+		BDD& operator=(const BDD& right);
 		BDD  operator!() const;  // Not 
 		BDD  operator+(const BDD& other) const; // Or
 		BDD  operator*(const BDD& other) const; // And
@@ -71,51 +73,51 @@ public:
 		BDD  operator%(const BDD& other) const; // Nor
 		BDD  operator|(const BDD& other) const; // Nand
 		BDD  operator&(const BDD& other) const; // XNor
-        int  Variable();
-        BDD  Then() const;
-        BDD  Else() const;
-        BDD  Exist(const BDD& cube);
-        BDD  Universal(const BDD& cube);
-        BDD  Restrict(const BDD& other) const;
-        BDD  Compose(int v, const BDD& other) const;
-        BDD  Permute(const vector<int> &permu) const;
-        BDD  AndExist(const BDD& other, const BDD& cube);
-        bool IsComp() { return (ISCOMP(node) != 0); }
-        void Support(vector<int> &vars);
-        		
+		int  Variable();
+		BDD  Then() const;
+		BDD  Else() const;
+		BDD  Exist(const BDD& cube);
+		BDD  Universal(const BDD& cube);
+		BDD  Restrict(const BDD& other) const;
+		BDD  Compose(int v, const BDD& other) const;
+		BDD  Permute(const std::vector<int> &permu) const;
+		BDD  AndExist(const BDD& other, const BDD& cube);
+		bool IsComp() { return (ISCOMP(node) != 0); }
+		void Support(std::vector<int> &vars);
+
 		XManager *manager() const;
 		DD Node() const;
-};
+	};
 
-class XBDDManager{
-private:
-    XManager *mgr;
+	class XBDDManager {
+	private:
+		XManager *mgr;
 
-public:
-    XBDDManager(int varCount){ mgr = new XManager(varCount);}
-    ~XBDDManager(){ delete mgr; }
-    void Clear(int varCnt){ mgr->Clear(varCnt); }
+	public:
+		XBDDManager() { mgr = new XManager(int(1E4)); }
+		XBDDManager(int varCount) { mgr = new XManager(varCount); }
+		~XBDDManager() { delete mgr; }
+		void Clear(int varCnt) { mgr->Clear(varCnt); }
 
-    BDD  BddOne(){ return BDD(mgr, mgr->One);}
-    BDD  BddZero(){ return BDD(mgr, mgr->Zero);}    
-    BDD  BddVar(int varIndex){ return BDD(mgr, varIndex); }  
-    BDD  Ite(const BDD &f, const BDD &g, const BDD &h){ return BDD(mgr, mgr->ite(f.node, g.node, h.node)); };   
-        
-    void   GarbageCollection(){ mgr->GarbageCollection(); };
-    void   SetMaxCacheSize(int v){ mgr->SetMaxCacheSize(v); };    
-    int    GetUTableCount(){ return mgr->GetUTableCount(); };
-    int    GetCacheCount(){ return mgr->GetCacheCount(); };
-    int    NodeCount(){ return mgr->NodeCount(); };
-    int    DeadCount(){ return mgr->DeadCount(); }
-    double Get_CTable_HitRate() { return mgr->Get_CTable_HitRate(); }
-    double Get_UTable_HitRate() { return mgr->Get_UTable_HitRate(); }
-    XManager *manager() const { return mgr; };
+		BDD  BddOne() { return BDD(mgr, mgr->One); }
+		BDD  BddZero() { return BDD(mgr, mgr->Zero); }
+		BDD  BddVar(int varIndex) { return BDD(mgr, varIndex); }
+		BDD  Ite(const BDD &f, const BDD &g, const BDD &h) { return BDD(mgr, mgr->ite(f.node, g.node, h.node)); };
 
-    int    VarDistanceOf(BDD A, BDD B) { return mgr->VarDistanceOf(A.Node(), B.Node());}
-    int    LargestPath(BDD from, vector<int> &path){ return mgr->LargestPath(from.Node(), path); }     
-    void   ShowInfo(double vtime = 0){ mgr->ShowInfo(vtime); }
-    void   ShowInfoToFile(const char *filename){ mgr->ShowInfoToFile(filename); };
-    void   ShowInfoToFile(const char *filename, const string &info){ mgr->ShowInfoToFile(filename, info); };
-};
+		void   GarbageCollection() { mgr->GarbageCollection(); };
+		void   SetMaxCacheSize(int v) { mgr->SetMaxCacheSize(v); };
+		int    GetUTableCount() { return mgr->GetUTableCount(); };
+		int    GetCacheCount() { return mgr->GetCacheCount(); };
+		int    NodeCount() { return mgr->NodeCount(); };
+		int    DeadCount() { return mgr->DeadCount(); }
+		double Get_CTable_HitRate() { return mgr->Get_CTable_HitRate(); }
+		double Get_UTable_HitRate() { return mgr->Get_UTable_HitRate(); }
+		XManager *manager() const { return mgr; };
 
-#endif
+		int    VarDistanceOf(BDD A, BDD B) { return mgr->VarDistanceOf(A.Node(), B.Node()); }
+		int    LargestPath(BDD from, std::vector<int> &path) { return mgr->LargestPath(from.Node(), path); }
+		void   ShowInfo(double vtime = 0) { mgr->ShowInfo(vtime); }
+		void   ShowInfoToFile(const char *filename) { mgr->ShowInfoToFile(filename); };
+		void   ShowInfoToFile(const char *filename, const std::string &info) { mgr->ShowInfoToFile(filename, info); };
+	};
+}
