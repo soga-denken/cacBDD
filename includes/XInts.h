@@ -17,7 +17,7 @@ met:
   and/or other materials provided with the distribution.
 
 * Neither the name of the University of Beijing Technology and
-  the University of Griffith nor the names of its contributors 
+  the University of Griffith nor the names of its contributors
   may be used to endorse or promote products derived from this
   software without specific prior written permission.
 
@@ -39,40 +39,66 @@ written by
    Guanfeng Lv, last updated 10/26/2012
 *****************************************************************************/
 
-#ifndef __BASE__
-#define __BASE__
 
-#define Max(a,b) ((a > b)?a:b)
-#define Min(a,b) ((a < b)?a:b)
-//-------------------------------------
-#define ONE_MILLION 1048576
-//-------------------------------------
-#define DD int
-#define ADDR(k)      (k & 0x7FFFFFFF)
-#define ISCOMP(A)    (A & 0x80000000) 
-//-------------------------------------
-#define EXIST         0x80000001
-#define RESTRICT      0x80000002
-#define AND           0x80000003
-#define XOR           0x80000004
-#define OP_MAX_VALUE  0x00000010 
-//-------------------------------------
-#define BDD_ITE                 0x02  
-#define BDD_AND_ABSTRACT        0x06  
-#define BDD_XOR_EXIST_ABSTRACT	0x0a  
-#define BDD_COMPOSE_RECUR       0x0e  
-#define BDD_ITE_CONSTANT        0x22  
-//-------------------------------------
-#define DD_P1 12582917
-#define DD_P2 4256249
-#define DD_P3 741457
-//-------------------------------------
-#define CACHE_DYN 0
-#define CACHE_FIX 1
-#define CACHE_OLD 2
-//=====================================
 
-#define Hash3(o,f,g,s) (((((unsigned)(unsigned long)(f) + (unsigned)(unsigned long)(o)) * DD_P1 + (unsigned)(unsigned long)(g)) * DD_P2) >> (s))
-#define Hash2(f,g,s) ((((unsigned)(unsigned long)(f) * DD_P1 + (unsigned)(unsigned long)(g)) * DD_P2) >> (s))
+#pragma once
 
-#endif
+#include <memory.h>
+#include <iostream>
+
+namespace cacBDD
+{
+
+	class XInts {
+	private:
+		int size;
+		int *buffer;
+	public:
+		XInts() :size(0), buffer(0) {};
+		~XInts() {
+			size = 0;
+			if (buffer) {
+				free(buffer);
+				buffer = NULL;
+			};
+		}
+		inline void set_size(int vsize);
+		inline int  get_size();
+		inline void set_value(int index, int value);
+		inline int  get_value(int index);
+	};
+
+	inline void XInts::set_size(int vsize)
+	{
+		if (buffer) {
+			free(buffer);
+			buffer = NULL;
+		}
+		size = vsize;
+
+		buffer = (int *)realloc(buffer, size * sizeof(int));
+		memset(buffer, 0, size * sizeof(int));
+	}
+
+	inline int  XInts::get_size()
+	{
+		return size;
+	}
+
+	inline void XInts::set_value(int index, int value)
+	{
+		if (index >= size) {
+			int addCount = (index - size) + 1000;
+			buffer = (int *)realloc(buffer, (size + addCount)*sizeof(int));
+			memset(&buffer[size], 0, addCount * sizeof(int));
+			size += addCount;
+		}
+		buffer[index] = value;
+	}
+
+	inline int  XInts::get_value(int index)
+	{
+		if (index >= size) return 0;
+		return buffer[index];
+	}
+}

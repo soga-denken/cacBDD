@@ -17,7 +17,7 @@ met:
   and/or other materials provided with the distribution.
 
 * Neither the name of the University of Beijing Technology and
-  the University of Griffith nor the names of its contributors 
+  the University of Griffith nor the names of its contributors
   may be used to endorse or promote products derived from this
   software without specific prior written permission.
 
@@ -39,44 +39,36 @@ written by
    Guanfeng Lv, last updated 10/26/2012
 *****************************************************************************/
 
-#include "DdNode.h"
+#pragma once
 
-DdNodes::DdNodes()
-{  
-    slots = NULL;        
-}
+#include <DdNode.h>
 
-DdNodes::~DdNodes()
+
+namespace cacBDD
 {
-    Clear();
-}
 
-void DdNodes::Init(int vSlotSize)
-{
-    typedef DdNode* PDdNode;
-    slots = new PDdNode[10000];   
-    for(int i=0; i<10000; i++){
-        slots[i] = 0;
-    } 
+	class XManager;
 
-    slotSize = vSlotSize;  
-    slots[0] = new DdNode[slotSize];    
-    for(int k=0; k<slotSize; k++){
-        slots[0][k].SetValue(0,0,0,0);
-    } 
+	class XUTable {
+	private:
+		friend class XManager;
 
-    slotCount = 1; 
-    nodeCount = 1;        
-}
+		XManager *mgr;
+		int count;
+		int shiftSize;
+		DD *items;
+		long long findCount;
+		long long foundedCount;
+		double LinkLength();
+		void   Refresh();
 
-void DdNodes::Clear()
-{
-    if(slots == NULL) return ;
+	public:
+		XUTable(XManager *manager, int vBitCount);
+		~XUTable();
+		void  Clear();
+		void  Expand();
+		DD    Find_or_Add_Unique_Table(int v, DD A, DD B);
+		double HitRate() { return 1.0 * foundedCount / std::max(findCount, long long(1)); }
+	};
 
-    for(int i=0; i<slotCount; i++){
-        delete [](slots[i]);
-        slots[i] = NULL;
-    }
-    delete []slots;    
-    slots = NULL;
 }
