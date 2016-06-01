@@ -1,20 +1,17 @@
 README
 ===============
 
-This cacBDD is modified so that it is easy to compile under Windows and Linux.
+This is a custom version of cacBDD so as to easily compile under Windows and Linux.
 
-The following platforms are supported:
+The library can be compiled under the following platforms:
 * Visual Studio 2015 (32/64bits)
 * g++ 4.82 or higher under Ubuntu 14.04 (32/64bits)
-
-Shota Soga
-shota.soga@gmail.com
 
 Differences from original cacBDD:
 * Removed all MACROs from cacBDD and replaced them with equivalent constants and functions.
 * All functions and constants are now inside cacBDD namespace
 
-The following is the original cacBDD's README.
+Original cacBDD's README.
 ===============
 The CacBDD package is a package written in ANSI C++ for the manipulation of 
 ordered binary decision diagrams. 
