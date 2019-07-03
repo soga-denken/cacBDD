@@ -33,7 +33,12 @@ namespace cacBDD
 		{
 			char buf[50];
 			memset(buf, 0, 50);
+			// suppress C4996 warning
+#ifdef _MSC_VER
+			sprintf_s(buf, "%d", v);
+#else
 			sprintf(buf, "%d", v);
+#endif
 			std::string r = buf;
 			size_t k = r.length();
 			for (unsigned int i = 0; i < outlen - k; i++) {
@@ -46,7 +51,12 @@ namespace cacBDD
 		{
 			char buf[50];
 			memset(buf, 0, 50);
+			// suppress C4996 warning
+#ifdef _MSC_VER
+			sprintf_s(buf, "%lld", v);
+#else
 			sprintf(buf, "%lld", v);
+#endif
 			std::string r = buf;
 			size_t k = r.length();
 			for (unsigned int i = 0; i < outlen - k; i++) {
@@ -60,7 +70,12 @@ namespace cacBDD
 			v = format_double(v, dotlen);
 			char buf[50];
 			memset(buf, 0, 50);
+			// suppress C4996 warning
+#ifdef _MSC_VER
+			sprintf_s(buf, "%f", v);
+#else
 			sprintf(buf, "%f", v);
+#endif
 			std::string r = buf;
 			int k = (int)r.length();
 			for (int i = 0; i < outlen - k; i++) {
